@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello Cocos2d-JS</title> 
+    <script type="text/javascript" src="cocos2d-js-v3.5.js" charset="UTF-8"></script>
+</head>
+<body>   
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
+    <script type="text/javascript">
+          window.onload = function(){
+              cc.game.onStart = function(){
+                  //load resources
+                  cc.LoaderScene.preload(["HelloWorld.png"], function () {
+                      var MyScene = cc.Scene.extend({
+                          onEnter:function () {
+                              this._super();
+                              var size = cc.director.getWinSize();
+                              var sprite = cc.Sprite.create("HelloWorld.png");
+                              sprite.setPosition(size.width / 2, size.height / 2);
+                              sprite.setScale(0.8);
+                              this.addChild(sprite, 0);
+
+                              var label = cc.LabelTTF.create("Hello World", "Arial", 40);
+                              label.setPosition(size.width / 2, size.height / 2);
+                              this.addChild(label, 1);
+
+
+
+                              // ----- スワイプ検知（ここから）
+                              cc.eventManager.addListener(cc.EventListener.create({
+                                  event: cc.EventListener.TOUCH_ALL_AT_ONCE,
+
+                                  onTouchesBegan: function(touches, event) {
+                                      var touch = touches[0];
+                                      var loc = touch.getLocation();
+
+                                      self.touchStartPoint = {
+                                          x: loc.x,
+                                          y: loc.y
+                                      };
+                                      self.touchLastPoint = {
+                                          x: loc.x,
+                                          y: loc.y
+                                      };
+                                  },
+
+                                  onTouchesMoved: function(touches, event) {
+                                      var touch = touches[0];
+                                      var loc = touch.getLocation();
+                                      var start = self.touchStartPoint;
+                                      var touchThreshold = 100;             // しきい値
+
+                                      if( loc.x < start.x - touchThreshold ) {
+                                          cc.log("left swipe");
+                                      }
+                                      if( loc.x > start.x + touchThreshold ) {
+                                          cc.log("right swipe");
+                                      }
+                                      if( loc.y < start.y - touchThreshold ) {
+                                          cc.log("down swipe");
+                                      }
+                                      if( loc.y > start.y + touchThreshold ) {
+                                          cc.log("up swipe");
+                                      }
+                                  },
+
+                                  onTouchesEnded: function(touches, event){
+                                      self.touchStartPoint = null;
+                                      self.touchLastPoint = null;
+                                  }
+
+                              }), this);
+                              // ----- スワイプ検知（ここまで）
+
+
+
+                          }
+                      });
+                      cc.director.runScene(new MyScene());
+                  }, this);
+              };
+              cc.game.run("gameCanvas");
+          };
+    </script>
+</body>
+</html>
